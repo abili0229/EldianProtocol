@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eldian Protocol - Interface Tatica</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Barra Lateral -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <img src="eldian.jpg" alt="Eldian Protocol" class="sidebar-logo-img">
+        <h2>Eldian Protocol</h2>
+        <small>District Shiganshina</small>
+      </div>
+
+      <button class="btn-new-chat" id="btn-new-expedition">
+        <i class="fa-solid fa-plus"></i> Nova Expedição
+      </button>
+
+      <nav class="history-menu">
+        <span class="menu-label">Arquivos Recentes</span>
+        <ul>
+          <li><a href="#" id="menu-relatorio" class="active"><i class="fa-solid fa-clock-rotate-left"></i> Relatório Tático #104</a></li>
+          <li><a href="#" id="menu-mapeamento"><i class="fa-solid fa-map"></i> Mapeamento Muralha Rose</a></li>
+          <li><a href="#" id="menu-anomalia"><i class="fa-solid fa-eye"></i> Anomalia Encontrada</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="#" id="menu-config"><i class="fa-solid fa-gear"></i> Configurações</a>
+      <a href="#" id="menu-suporte"><i class="fa-solid fa-circle-question"></i> Suporte Tático</a>
+    </div>
+  </aside>
+
+  <!-- Painel Principal -->
+  <main id="chat-container">
+    <!-- Tela Inicial Centralizada -->
+    <section id="welcome-screen" class="welcome-screen">
+      <img src="eldian.jpg" alt="Eldian Protocol Logo" class="welcome-logo-img">
+      <h1>Vamos matar alguns titans!</h1>
+    </section>
+
+    <!-- Lista de Históricos para Seleção -->
+    <div id="history-selector-container" class="hidden"></div>
+
+    <!-- Campo de Digitação Embaixo -->
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Qual a missão de hoje?" autocomplete="off">
+      <button type="submit" style="background: none; border: none; color: #fff; cursor: pointer;">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </form>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
