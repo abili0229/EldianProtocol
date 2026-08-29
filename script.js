@@ -1,5 +1,16 @@
-const AZURE_API_KEY = ""; // Insira sua chave do Azure mantendo as aspas
+let AZURE_API_KEY = "";
 
+async function loadApiKey() {
+  try {
+    const response = await fetch('./keys.json');
+    const data = await response.json();
+    AZURE_API_KEY = data.API_KEY;
+  } catch (error) {
+    console.error("Erro ao carregar keys.json:", error);
+  }
+}
+
+loadApiKey();
 document.addEventListener('DOMContentLoaded', () => {
   const chatForm = document.getElementById('chat-form');
   const chatInput = document.getElementById('chat-input');
