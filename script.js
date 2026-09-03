@@ -10,14 +10,14 @@ async function loadApiKey() {
   }
 }
 
-loadApiKey();
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadApiKey();
+
   const chatForm = document.getElementById('chat-form');
   const chatInput = document.getElementById('chat-input');
   const welcomeScreen = document.getElementById('welcome-screen');
   const chatContainer = document.getElementById('chat-container');
   const historySelectorContainer = document.getElementById('history-selector-container');
-
   let currentSessionId = sessionStorage.getItem('eldian_current_session_id');
   let currentMode = 'chat';
 
