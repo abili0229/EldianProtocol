@@ -28,3 +28,12 @@ ELDIANPROTOCOL/
 ├── fundo.jpg             # Imagem de plano de fundo
 └── keys.json             # (Não versionado) Arquivo local com a chave de API
 
+### ⚙️ Configuração do `keys.json` (Chave e Endpoint)
+
+Para conectar o projeto à Azure OpenAI, crie o arquivo **`keys.json`** na raiz do projeto com o seguinte formato:
+
+```json
+{
+  "API_KEY": "SUA_CHAVE_AQUI",
+  "ENDPOINT": "[https://SEU-RECURSO.openai.azure.com/](https://SEU-RECURSO.openai.azure.com/)"
+}

@@ -1,10 +1,12 @@
 let AZURE_API_KEY = "";
+let AZURE_ENDPOINT = "";
 
 async function loadApiKey() {
   try {
     const response = await fetch('./keys.json');
     const data = await response.json();
     AZURE_API_KEY = data.API_KEY;
+    AZURE_ENDPOINT = data.ENDPOINT;
   } catch (error) {
     console.error("Erro ao carregar keys.json:", error);
   }
