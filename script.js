@@ -1,5 +1,7 @@
 let AZURE_API_KEY = "";
 let AZURE_ENDPOINT = "";
+let SPEECH_KEY = "";
+let SPEECH_REGION = "";
 
 async function loadApiKey() {
   try {
@@ -7,6 +9,8 @@ async function loadApiKey() {
     const data = await response.json();
     AZURE_API_KEY = data.API_KEY;
     AZURE_ENDPOINT = data.ENDPOINT;
+    SPEECH_KEY = data.SPEECH_KEY;
+    SPEECH_REGION = data.SPEECH_REGION;
   } catch (error) {
     console.error("Erro ao carregar keys.json:", error);
   }
@@ -64,7 +68,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const contentDiv = document.createElement('div');
     contentDiv.classList.add('message-content');
-    contentDiv.innerText = text;
+    
+    if (sender === 'bot') {
+        const textoLimpo = text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        
+        contentDiv.innerHTML = `
+            <span>${text}</span>
+            <button class="btn-tts" onclick="falarTexto('${textoLimpo}', this)" title="Ouvir mensagem" style="background: none; border: none; cursor: pointer; color: #a0a0a0; margin-left: 10px;">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+        `;
+    } else {
+        contentDiv.innerText = text;
+    }
 
     msgDiv.appendChild(contentDiv);
     messagesList.appendChild(msgDiv);
@@ -206,7 +222,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (historySelectorContainer) historySelectorContainer.classList.add('hidden');
     messagesList.classList.remove('hidden');
     
-    // Recarrega as mensagens gravadas na sessão atual
     loadSessionMessages(currentSessionId);
   }
 
@@ -586,3 +601,80 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 });
+
+// --- SISTEMA DE ÁUDIO STRICT-TOGGLE (LIGA E CORTA ABSOLUTAMENTE NA HORA) ---
+
+let currentAudioPlayer = null;
+let currentActiveButton = null;
+
+window.falarTexto = function(texto, btnElement) {
+  if (!SPEECH_KEY || !SPEECH_REGION) {
+    console.error("Credenciais de voz não configuradas.");
+    return;
+  }
+
+  // Se já houver um áudio tocando:
+  if (currentAudioPlayer) {
+    const mesmoBotao = (currentActiveButton === btnElement);
+    interromperAudioTotalmente();
+
+    // Se o clique foi no mesmo botão que estava tocando -> Apenas para e encerra.
+    if (mesmoBotao) {
+      return;
+    }
+  }
+
+  // Se for para iniciar uma nova fala:
+  currentActiveButton = btnElement;
+  if (btnElement) btnElement.style.color = "#00ffcc";
+
+  const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(SPEECH_KEY, SPEECH_REGION);
+  speechConfig.speechSynthesisVoiceName = "pt-BR-AntonioNeural";
+
+  // Usamos sintetizador sem saída de alto-falante nativa para podermos controlar o buffer manualmente
+  const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, null);
+
+  synthesizer.speakTextAsync(
+    texto,
+    function (result) {
+      if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
+        // Converte o áudio bruto da resposta em um Blob do HTML5
+        const audioBlob = new Blob([result.audioData], { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        // Criamos um elemento de áudio nativo que podemos controlar totalmente
+        currentAudioPlayer = new Audio(audioUrl);
+
+        currentAudioPlayer.onended = function() {
+          interromperAudioTotalmente();
+        };
+
+        currentAudioPlayer.play().catch(err => {
+          console.error("Erro ao tocar áudio:", err);
+          interromperAudioTotalmente();
+        });
+      } else {
+        interromperAudioTotalmente();
+      }
+      synthesizer.close();
+    },
+    function (err) {
+      console.error("Erro na síntese do Azure:", err);
+      interromperAudioTotalmente();
+      synthesizer.close();
+    }
+  );
+};
+
+function interromperAudioTotalmente() {
+  if (currentAudioPlayer) {
+    currentAudioPlayer.pause();
+    currentAudioPlayer.currentTime = 0;
+    currentAudioPlayer = null;
+  }
+
+  if (currentActiveButton) {
+    currentActiveButton.style.color = "#a0a0a0";
+    currentActiveButton = null;
+  }
+}
